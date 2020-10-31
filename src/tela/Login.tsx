@@ -6,16 +6,17 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 
 import { Input, Button } from 'react-native-elements';
+import { ToastAndroid } from 'react-native';
 
 export default function Login() {
   const nav = useNavigation();
 
   const logar = (dados: any) => {
     console.log(dados);
-    if (dados.email == 'teste@teste.com' && dados.senha == '123456')
+    if (dados.email == 'teste@teste.com')
       nav.navigate('Home');
     else
-      console.log('Email ou senha incorreta ');
+    ToastAndroid.show("Email invalido", 2000);
   }
 
 
@@ -24,11 +25,11 @@ export default function Login() {
       <Text style={styles.titulo}>Help Me!</Text>
 
       <Formik
-        initialValues={{ email: '', senha: '' }}
+        initialValues={{ email: ''}}
         onSubmit={logar}
         validationSchema={Yup.object().shape({
           email: Yup.string().required('Informe o email').email('E-mail não válido'),
-          senha: Yup.string().required('Informe a senha').min(6, 'A senha precisa ter 6 caracteres')
+          // senha: Yup.string().required('Informe a senha').min(6, 'A senha precisa ter 6 caracteres')
         })}
       >
         {({ handleChange, handleSubmit, errors, handleBlur, touched, values }) => (
@@ -43,7 +44,7 @@ export default function Login() {
             />
             {touched.email && <Text style={{ color: "white", fontSize: 20, textAlign: 'right' }}>{errors.email}</Text>}
 
-            <Input
+            {/* <Input
               leftIcon={{ type: 'font-awesome', name: 'unlock-alt', size: 25 }}
               placeholder="Digite seu senha"
               value={values.senha}
@@ -51,8 +52,8 @@ export default function Login() {
               secureTextEntry={true}
               onChangeText={handleChange("senha")}
               onBlur={handleBlur("senha")}
-            />
-            {touched.senha && <Text style={{ color: "white", fontSize: 20, textAlign: 'right' }}>{errors.senha}</Text>}
+            /> */}
+            {/* {touched.senha && <Text style={{ color: "white", fontSize: 20, textAlign: 'right' }}>{errors.senha}</Text>} */}
 
             <Button
               style={styles.butao}

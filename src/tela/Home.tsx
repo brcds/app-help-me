@@ -1,23 +1,36 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, } from 'react-native';
 
-import {useNavigation} from '@react-navigation/native';
+import {DrawerActions, useNavigation} from '@react-navigation/native';
 
-import {Button} from 'react-native-elements';
+import {Button, Input} from 'react-native-elements';
+
+import Toolbar from '../components/toolbar';
 
 export default function Home() {
     const nav = useNavigation();
 
     return (
+        <>
+        <Toolbar title="Welcome" menu/>
         <View style={styles.container}>
             <Text style={styles.texto}>Bem-vindo</Text>
 
             <Button 
-                title="Voltar"
+                title="Solicitar ajuda"
                 type="solid"
-                onPress={() => nav.goBack()}
+                style={{marginTop: 40 }}
+                buttonStyle={{backgroundColor:"#1E90FF"}}
+                onPress={() => nav.navigate('ListHelp')}
+            />
+            <Button 
+                title="Verficar match's"
+                type="solid"
+                style={{marginTop: 40}}
+                buttonStyle={{backgroundColor:"#1E90FF"}}
             />
         </View>
+        </>
     );
 }
 
@@ -26,10 +39,11 @@ const styles = StyleSheet.create({
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: 'black'
+      backgroundColor: 'black',
+      padding: 50
     },
     texto: {
-        color: 'yellow',
+        color: 'white',
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 15
