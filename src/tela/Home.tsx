@@ -28,6 +28,7 @@ export default function Home() {
                 type="solid"
                 style={{marginTop: 40}}
                 buttonStyle={{backgroundColor:"#1E90FF"}}
+                onPress={() => nav.navigate('ListMatch')}
             />
         </View>
         </>

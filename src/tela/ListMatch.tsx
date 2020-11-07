@@ -28,53 +28,11 @@ export default function Home() {
         }
     ]
 
-    useEffect(() => {
-        (async () => {
-          if (Platform.OS !== 'web') {
-            const { status } = await ImagePicker.requestCameraRollPermissionsAsync();
-            if (status !== 'granted') {
-              alert('Sorry, we need camera roll permissions to make this work!');
-            }
-          }
-        })();
-      }, []);
-
-      const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.All,
-          allowsEditing: true,
-          aspect: [4, 3],
-          quality: 1,
-        });
-    };
-      const takeImage = async () => {
-        let result = await ImagePicker.launchCameraAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.All,
-          allowsEditing: true,
-          aspect: [4, 3],
-          quality: 1,
-        });
-    };
-
     return (
         <>
         <Toolbar title="Welcome" menu/>
         <View style={styles.container}>
-            <Text style={styles.texto}>Feed de Ajuda</Text>
-
-            <Input 
-                placeholder="Digite seu texto"
-            />
-
-        <Button title="Selecione uma imagem da galeria" onPress={pickImage} buttonStyle={{backgroundColor:"green"}} />
-        <Button title="Tirar foto com a câmera" onPress={takeImage} buttonStyle={{backgroundColor:"green"}} />
-            
-            <Button 
-                title="Postar"
-                type="solid"
-                style={{marginTop: 20, marginBottom: 5}}
-                buttonStyle={{backgroundColor:"green"}}
-            />
+            <Text style={styles.texto}>Match's</Text>
 
             <FlatList 
                 data={ListFeed}

@@ -8,6 +8,7 @@ import Login from '../tela/Login';
 import Home from '../tela/Home';
 import Register  from '../tela/register';
 import ListHelp  from '../tela/ListHelp';
+import ListMatch  from '../tela/ListMatch';
 
 import DrawerNavigation from '../navigations/drawerNavigation';
 
@@ -19,6 +20,7 @@ export default function Navgation() {
         <Stack.Navigator screenOptions={{headerShown: false}}>
         <Stack.Screen component={DrawerNavigation} name="Home" />
 
+            <Stack.Screen component={ListMatch} name="ListMatch" />
             <Stack.Screen component={ListHelp} name="ListHelp" />
             <Stack.Screen component={Login} name="Login" />
 

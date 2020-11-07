@@ -4,6 +4,8 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 
 import Home from '../tela/Home';
 import ListHelp from '../tela/ListHelp';
+import ListMatch from '../tela/ListMatch';
+import Login from '../tela/Login';
 
 const Drawer = createDrawerNavigator();
 
@@ -21,6 +23,15 @@ const DrawerNavigation = () => {
         <Drawer.Screen 
             name="ListHelp"
             component={ListHelp}
+        />
+        
+        <Drawer.Screen 
+            name="ListMatch"
+            component={ListMatch}
+        />
+        <Drawer.Screen 
+            name="Sair"
+            component={Login}
         />
         
     </Drawer.Navigator>
