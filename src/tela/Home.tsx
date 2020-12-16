@@ -1,5 +1,6 @@
 import React from 'react';
 import {View, Text, StyleSheet, } from 'react-native';
+import {AdMobBanner} from 'expo-ads-admob';
 
 import {DrawerActions, useNavigation} from '@react-navigation/native';
 
@@ -12,25 +13,23 @@ export default function Home() {
 
     return (
         <>
-        <Toolbar title="Welcome" menu/>
+        <Toolbar title="Bem vindo" menu/>
         <View style={styles.container}>
-            <Text style={styles.texto}>Bem-vindo</Text>
 
-            <Button 
-                title="Solicitar ajuda"
-                type="solid"
-                style={{marginTop: 40 }}
-                buttonStyle={{backgroundColor:"#1E90FF"}}
-                onPress={() => nav.navigate('ListHelp')}
+            <Button
+                containerStyle={styles.butao}
+                title="Pedir ajuda (publicar)"
+                onPress={() => nav.navigate('Postagem')}
             />
-            <Button 
-                title="Verficar match's"
-                type="solid"
-                style={{marginTop: 40}}
-                buttonStyle={{backgroundColor:"#1E90FF"}}
-                onPress={() => nav.navigate('ListMatch')}
+
+            <Button
+                containerStyle={styles.butao}
+                title="Lista de publicações"
+                onPress={() => nav.navigate('Feed de ajuda')}
             />
         </View>
+
+        <AdMobBanner bannerSize="fullBanner" adUnitID="ca-app-pub-3940256099942544/6300978111" />
         </>
     );
 }
@@ -41,12 +40,15 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: 'black',
-      padding: 50
     },
     texto: {
         color: 'white',
         fontSize: 18,
         fontWeight: 'bold',
-        marginBottom: 15
-    }
+    },
+    butao: {
+      marginTop: 25,
+      width: 150,
+      alignSelf: 'center'
+    },
   });

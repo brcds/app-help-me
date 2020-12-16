@@ -1,33 +1,41 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import firebase from 'firebase';
 
 import { createStackNavigator } from '@react-navigation/stack'
 import { NavigationContainer } from '@react-navigation/native'
 
-
 import Login from '../tela/Login';
-import Home from '../tela/Home';
 import Register  from '../tela/register';
-import ListHelp  from '../tela/ListHelp';
-import ListMatch  from '../tela/ListMatch';
 
 import DrawerNavigation from '../navigations/drawerNavigation';
 
 const Stack = createStackNavigator();
 
 export default function Navgation() {
+    const [logado, setLogado] = useState(false);
+
+    useEffect(() => {
+        firebase.auth().onAuthStateChanged(status => {
+            if (status) {
+                setLogado(true);
+            } else setLogado(false);
+          });
+    }, [])
+
     return (
         < NavigationContainer >
         <Stack.Navigator screenOptions={{headerShown: false}}>
-        <Stack.Screen component={DrawerNavigation} name="Home" />
 
-            <Stack.Screen component={ListMatch} name="ListMatch" />
-            <Stack.Screen component={ListHelp} name="ListHelp" />
+        {logado ? (
+            <Stack.Screen component={DrawerNavigation} name="Home" />
+        ): (
+            <>
             <Stack.Screen component={Login} name="Login" />
-
-            
             <Stack.Screen component={Register} name="Register" />
+            </>
+        )}
+            
         </Stack.Navigator>
         </NavigationContainer>
-        
     )
 }

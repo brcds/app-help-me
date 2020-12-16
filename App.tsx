@@ -1,12 +1,10 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-
+import firebase from 'firebase';
+import firebaseConfig from './src/configuracao/firebaseConfig';
 
 import Navegation from './src/navigations';
 
-import Login from './src/tela/Login';
-import Home from './src/tela/Home';
+firebase.initializeApp(firebaseConfig);
 
 export default function App() {
   return (
@@ -15,11 +13,3 @@ export default function App() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'black',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

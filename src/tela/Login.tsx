@@ -1,22 +1,31 @@
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
-
+import { StyleSheet, View, Text, ToastAndroid } from 'react-native';
+import firebase from 'firebase';
+import 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 
+
 import { Input, Button } from 'react-native-elements';
-import { ToastAndroid } from 'react-native';
+
+interface Usuario {
+  email: string;
+  senha: string;
+}
 
 export default function Login() {
   const nav = useNavigation();
+  const fireStore = firebase.firestore();
 
-  const logar = (dados: any) => {
-    console.log(dados);
-    if (dados.email == 'teste@teste.com')
-      nav.navigate('Home');
-    else
-    ToastAndroid.show("Email invalido", 2000);
+  const logar = (dados: Usuario) => {
+    firebase
+      .auth()
+      .signInWithEmailAndPassword(dados.email, dados.senha)
+      .then(() => {})
+      .catch(err => {
+        ToastAndroid.show('Usuário / Senha Incorreto(s)! Favor verificar e tentar novamente.', 2500);
+      });
   }
 
 
@@ -25,17 +34,17 @@ export default function Login() {
       <Text style={styles.titulo}>Help Me!</Text>
 
       <Formik
-        initialValues={{ email: ''}}
-        onSubmit={logar}
+        initialValues={{ email: '', senha: ''}}
+        onSubmit={values => logar(values)}
         validationSchema={Yup.object().shape({
           email: Yup.string().required('Informe o email').email('E-mail não válido'),
-          // senha: Yup.string().required('Informe a senha').min(6, 'A senha precisa ter 6 caracteres')
+          senha: Yup.string().required('Informe a senha').min(6, 'A senha precisa ter 6 caracteres')
         })}
       >
         {({ handleChange, handleSubmit, errors, handleBlur, touched, values }) => (
-          <View>
+          <View style={styles.caixaForm}>
             <Input
-              leftIcon={{ type: 'font-awesome', name: 'envelope', size: 20 }}
+              leftIcon={{ type: 'font-awesome', name: 'envelope', size: 20, color: 'white' }}
               placeholder="Digite seu email"
               value={values.email}
               inputStyle={{ marginLeft: 10, color: 'white' }}
@@ -44,21 +53,20 @@ export default function Login() {
             />
             {touched.email && <Text style={{ color: "white", fontSize: 20, textAlign: 'right' }}>{errors.email}</Text>}
 
-            {/* <Input
-              leftIcon={{ type: 'font-awesome', name: 'unlock-alt', size: 25 }}
-              placeholder="Digite seu senha"
+             <Input
+              leftIcon={{ type: 'font-awesome', name: 'unlock-alt', size: 25, color: 'white' }}
+              placeholder="Digite sua senha"
               value={values.senha}
               inputStyle={{ marginLeft: 10, color: 'white' }}
               secureTextEntry={true}
               onChangeText={handleChange("senha")}
               onBlur={handleBlur("senha")}
-            /> */}
-            {/* {touched.senha && <Text style={{ color: "white", fontSize: 20, textAlign: 'right' }}>{errors.senha}</Text>} */}
+            /> 
+            {touched.senha && <Text style={{ color: "white", fontSize: 20, textAlign: 'right' }}>{errors.senha}</Text>} 
 
             <Button
-              style={styles.butao}
+              containerStyle={styles.botao}
               title="Entrar"
-              type="solid"
               onPress={() => handleSubmit()}
             />
           </View>
@@ -68,7 +76,7 @@ export default function Login() {
       <View style={styles.caixaButao}>
 
         <Button
-          style={styles.butao}
+          containerStyle={styles.botao}
           title="Registrar"
           type="solid"
           onPress={() => nav.navigate('Register')}
@@ -92,11 +100,16 @@ const styles = StyleSheet.create({
     color: 'yellow',
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 15
+    marginBottom: 85
   },
-  butao: {
-    marginTop: 15,
-    width: 250,
+  caixaForm: {
+    width: '100%',
+    paddingLeft: 30,
+    paddingRight: 30,
+  },
+  botao: {
+    marginTop: 25,
+    width: 150,
     alignSelf: 'center'
   },
   caixaButao: {

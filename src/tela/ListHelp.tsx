@@ -1,60 +1,78 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, FlatList, Platform, Image } from 'react-native';
+import {View, Text, StyleSheet, FlatList, Platform, Image, ToastAndroid } from 'react-native';
 import {DrawerActions, useNavigation} from '@react-navigation/native';
-import * as ImagePicker from 'expo-image-picker';
+import firebase from 'firebase';
+import 'firebase/firestore';
 
 import {Button, Input} from 'react-native-elements';
 import Toolbar from '../components/toolbar';
 
+type Publicacoes = Array<{
+    autor: string;
+    email: string;
+    publicacao: string;
+    telefone: string;
+    id: string;
+}>;
+
 export default function Home() {
     const nav = useNavigation();
-    const [image, setImage] = useState(null);
-
-    const ListFeed = [
-        {
-            id: '1',
-            title: 'Alcolico Anônimo',
-            text: 'Eu preciso de ajuda pois sou um viciado em cerveja e bebidas quentes.'
-        },
-        {
-            id: '2',
-            title: 'Alcolico Anônimo',
-            text: 'Eu preciso de ajuda pois sou um viciado em cerveja e bebidas quentes.'
-        },
-        {
-            id: '3',
-            title: 'Alcolico Anônimo',
-            text: 'Eu preciso de ajuda pois sou um viciado em cerveja e bebidas quentes.'
-        }
-    ]
+    const fireStore = firebase.firestore();
+    const [listaPublicacoes, setListaPublicacoes] = useState<Publicacoes>();
 
     useEffect(() => {
-        (async () => {
-          if (Platform.OS !== 'web') {
-            const { status } = await ImagePicker.requestCameraRollPermissionsAsync();
-            if (status !== 'granted') {
-              alert('Sorry, we need camera roll permissions to make this work!');
-            }
-          }
-        })();
-      }, []);
+        async function carregarPublicacoes() {
+           await fireStore.collection('publicacoes').get().then(resultado => {
+               const publicacoes: Publicacoes = [];
+                resultado.forEach(result => {
+                    const publi = {
+                        autor: result.get('autor'),
+                        email: result.get('email'),
+                        publicacao: result.get('publicacao'),
+                        telefone: result.get('telefone'),
+                        id: result.id,
+                    }
+                    publicacoes.push(publi);
+                })
+                setListaPublicacoes(publicacoes);
+            })
+        }
+        carregarPublicacoes();
+    }, [fireStore])
 
-      const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.All,
-          allowsEditing: true,
-          aspect: [4, 3],
-          quality: 1,
-        });
-    };
-      const takeImage = async () => {
-        let result = await ImagePicker.launchCameraAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.All,
-          allowsEditing: true,
-          aspect: [4, 3],
-          quality: 1,
-        });
-    };
+    const curtir = (id: string) => {
+        fireStore
+          .collection('usuarios')
+          .doc(firebase.auth().currentUser?.uid)
+          .update({
+              publicacoesCurtidas: firebase.firestore.FieldValue.arrayUnion(id),
+          })
+          .then(() => {
+            nav.reset({
+                index: 0,
+                routes: [{ name: 'Feed de ajuda' }],
+              });
+              ToastAndroid.show('Você curtiu a publicação', 2000);
+          })
+          .catch(err => {
+            ToastAndroid.show('Erro ao curtir a publicação! Favor verificar e tentar novamente.', 2500);
+          });
+      }
+
+    const descurtir = (id: string) => {
+        fireStore
+          .collection('usuarios')
+          .doc(firebase.auth().currentUser?.uid)
+          .update({
+              publicacoesCurtidas: firebase.firestore.FieldValue.arrayRemove(id),
+          })
+          .then(() => {
+              ToastAndroid.show('Você descurtiu a publicação', 2000);
+          })
+          .catch(err => {
+            ToastAndroid.show('Erro você não curtiu essa publicação!.', 2500);
+          });
+    }
 
     return (
         <>
@@ -62,32 +80,34 @@ export default function Home() {
         <View style={styles.container}>
             <Text style={styles.texto}>Feed de Ajuda</Text>
 
-            <Input 
-                placeholder="Digite seu texto"
-            />
-
-        <Button title="Selecione uma imagem da galeria" onPress={pickImage} buttonStyle={{backgroundColor:"green"}} />
-        <Button title="Tirar foto com a câmera" onPress={takeImage} buttonStyle={{backgroundColor:"green"}} />
-            
-            <Button 
-                title="Postar"
-                type="solid"
-                style={{marginTop: 20, marginBottom: 5}}
-                buttonStyle={{backgroundColor:"green"}}
-            />
-
             <FlatList 
-                data={ListFeed}
+                data={listaPublicacoes}
                 keyExtractor={feed => feed.id}
                 showsVerticalScrollIndicator={false}
                 renderItem={({item: feed}) => (
                     <View style={styles.feedContainer}>
-                        <Text style={styles.title}>{feed.title}</Text>
-                        <Text style={styles.text}>{feed.text}</Text>
+                        <Text style={styles.text}>{feed.publicacao}</Text>
 
-                        <View>
-        
-                        </View>
+                        <Text style={styles.text}>Autor: {feed.autor}</Text>
+                        <Text style={styles.text}>Email: {feed.email}</Text>
+                        <Text style={styles.text}>Telefone: {feed.telefone}</Text>
+
+
+                        <Button
+                            containerStyle={styles.botao}
+                            title="Curtir"
+                            type="solid"
+                            buttonStyle={{backgroundColor: 'green'}}
+                            onPress={() => curtir(feed.id)}
+                        />
+
+                        <Button
+                            containerStyle={styles.botao}
+                            title="Descurtir"
+                            type="solid"
+                            buttonStyle={{backgroundColor: 'green'}}
+                            onPress={() => descurtir(feed.id)}
+                        />
                     </View>
                 )}
             />
@@ -111,14 +131,8 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 15
     },
-    title: {
-        fontSize: 18,
-        color: 'white',
-        marginBottom: 15
-    },
     feedContainer: {
         width: 250,
-        height: 150,
         display: 'flex',
         backgroundColor: 'blue',
         marginTop: 30,
@@ -130,6 +144,13 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: 'white',
         justifyContent: 'center',
-        marginLeft: 15
-    }
+        marginTop: 10,
+        textAlign: 'center',
+    },
+    botao: {
+      marginTop: 15,
+      width: 90,
+      alignSelf: 'center',
+      marginBottom: 10
+    },
   });
